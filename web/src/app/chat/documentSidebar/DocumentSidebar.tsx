@@ -52,24 +52,22 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
 
     return (
       <div
-        id="danswer-chat-sidebar"
-        className={`fixed inset-0 transition-opacity duration-300 z-50 bg-black/80 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`${isOpen ? "w-auto" : "w-0"}`}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             closeSidebar();
           }
         }}
       >
+       
         <div
-          className={`ml-auto rounded-l-lg relative border-l bg-text-100 sidebar z-50 absolute right-0 h-screen transition-all duration-300 ${
-            isOpen ? "opacity-100 translate-x-0" : "opacity-0 translate-x-[10%]"
+          className={`z-[100] relative shadow-2xl h-[calc(100vh-60px)] mr-4 mt-4 transform translate-x-0 translate-y-0 mb-4 ml-auto rounded-l-lg md:pb-4 md:pr-1 relative border-l bg-[#fff] sidebar z-50 absolute right-0 transition-all duration-300 ${
+            isOpen ? "opacity-100 md:w-[calc(50vw-2.5rem)]" : "opacity-0 translate-x-[10%]"
           }`}
           ref={ref}
-          style={{
-            width: initialWidth,
-          }}
         >
-          <div className="pb-6 flex-initial overflow-y-hidden flex flex-col h-screen">
+           <div className="absolute right-[12px] top-[12px] cursor-pointer" onClick={closeSidebar}>点我关闭</div>
+          <div className="pb-6 flex-initial overflow-y-hidden flex flex-col h-full">
             {popup}
             <div className="pl-3 mx-2 pr-6 mt-3 flex text-text-800 flex-col text-2xl text-emphasis flex font-semibold">
               {dedupedDocuments.length} Documents
