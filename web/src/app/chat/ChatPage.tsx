@@ -104,6 +104,7 @@ import BlurBackground from "./shared_chat_search/BlurBackground";
 import { NoAssistantModal } from "@/components/modals/NoAssistantModal";
 import { useAssistants } from "@/components/context/AssistantsContext";
 import { Divider } from "@tremor/react";
+import homeStore from "@/components/context/home2Store";
 
 const TEMP_USER_MESSAGE_ID = -1;
 const TEMP_ASSISTANT_MESSAGE_ID = -2;
@@ -133,8 +134,6 @@ export function ChatPage({
     shouldShowWelcomeModal,
     refreshChatSessions,
     showDocumentSidebar,
-    setShowDocumentSidebar,
-    setModalContent
   } = useChatContext();
 
   const { assistants: availableAssistants, finalAssistants } = useAssistants();
@@ -1784,7 +1783,7 @@ export function ChatPage({
   };
   const [documentSelection, setDocumentSelection] = useState(false);
   const toggleDocumentSelectionAspects = () => {
-    setShowDocumentSidebar(!showDocumentSidebar);
+    homeStore.setShowDocumentSidebar(!homeStore.showDocumentSidebar);
     setShowDocSidebar(false);
   };
 
@@ -2452,7 +2451,7 @@ export function ChatPage({
                                 stopGenerating={stopGenerating}
                                 openModelSettings={() => setSettingsToggled(true)}
                                 inputPrompts={userInputPrompts}
-                                showDocs={() => setShowDocumentSidebar(true)}
+                                showDocs={() => homeStore.setShowDocumentSidebar(true)}
                                 selectedDocuments={selectedDocuments}
                                 // assistant stuff
                                 selectedAssistant={liveAssistant}
@@ -2504,8 +2503,8 @@ export function ChatPage({
                         initialWidth={350}
                         ref={innerSidebarElementRef}
                         closeSidebar={() => {
-                          setShowDocumentSidebar(false);
-                          setModalContent('');
+                          homeStore.setShowDocumentSidebar(false); 
+                          homeStore.setModalContent('');
                         }}
                         selectedMessage={aiMessage}
                         selectedDocuments={selectedDocuments}

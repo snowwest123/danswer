@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { createPortal } from "react-dom";
 import { useChatContext } from "../context/ChatContext";
+import homeStore from "../context/home2Store";
 
 // Create a context for the tooltip group
 const TooltipGroupContext = createContext<{
@@ -68,11 +69,14 @@ export const CustomTooltip = ({
   const triggerRef = useRef<HTMLSpanElement>(null);
   const { groupHovered, setGroupHovered, hoverCountRef } =
     useContext(TooltipGroupContext);
-    const {
-      setShowDocumentSidebar,
-      setModalContent
-    } = useChatContext();
+    // const {
+    //   setShowDocumentSidebar,
+    //   setModalContent
+    // } = useChatContext();
   
+    
+
+
   const showTooltip = () => {
     hoverCountRef.current = true;
 
@@ -130,9 +134,9 @@ export const CustomTooltip = ({
         createPortal(
           <div
           onMouseEnter={showTooltip}
-          onClick={() => { 
-            setShowDocumentSidebar(true); 
-            setModalContent((content as any).props?.children as string)
+          onClick={() => {
+            homeStore.setShowDocumentSidebar(true); 
+            homeStore.setModalContent((content as any).props?.children as string);
           }}
         onMouseLeave={hideTooltip}
             className={`min-w-8 fixed z-[1000] ${

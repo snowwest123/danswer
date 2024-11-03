@@ -4,9 +4,10 @@ import { ChatDocumentDisplay } from "./ChatDocumentDisplay";
 import { usePopup } from "@/components/admin/connectors/Popup";
 import { removeDuplicateDocs } from "@/lib/documentUtils";
 import { Message } from "../interfaces";
-import { ForwardedRef, forwardRef, useEffect } from "react";
+import { ForwardedRef, forwardRef, useEffect, useState } from "react";
 import { autorun } from "mobx";
 import { useChatContext } from "@/components/context/ChatContext";
+import homeStore from "@/components/context/home2Store";
 
 interface DocumentSidebarProps {
   closeSidebar: () => void;
@@ -38,28 +39,28 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const { popup, setPopup } = usePopup();
+    const [open, setOpen] =  useState(homeStore.showDocumentSidebar);
+    const [content, setContent] =  useState(homeStore.modalContent);
 
     const selectedDocumentIds =
       selectedDocuments?.map((document) => document.document_id) || [];
 
     const currentDocuments = selectedMessage?.documents || null;
     const dedupedDocuments = removeDuplicateDocs(currentDocuments || []);
-    const {
-      showDocumentSidebar,
-      modalContent, 
-    } = useChatContext();
     // NOTE: do not allow selection if less than 75 tokens are left
     // this is to prevent the case where they are able to select the doc
     // but it basically is unused since it's truncated right at the very
     // start of the document (since title + metadata + misc overhead) takes up
     // space
     const tokenLimitReached = selectedDocumentTokens > maxTokens - 75;
-
-
+    useEffect(() => autorun(() => {
+      setOpen(homeStore.showDocumentSidebar);
+      setContent(homeStore.modalContent)
+    }), []);
 
     return (
       <div
-        className={`${showDocumentSidebar ? "w-auto" : "w-0"}`}
+        className={`${open ? "w-auto" : "w-0"}`}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             closeSidebar();
@@ -69,7 +70,7 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
        
         <div
           className={`z-[100] relative shadow-2xl h-[calc(100vh-60px)] mr-4 mt-4 transform translate-x-0 translate-y-0 mb-4 ml-auto rounded-l-lg md:pb-4 md:pr-1 relative border-l bg-[#fff] sidebar z-50 absolute right-0 transition-all duration-300 ${
-            showDocumentSidebar ? "opacity-100 md:w-[calc(50vw-2.5rem)]" : "opacity-0 translate-x-[10%]"
+            open ? "opacity-100 md:w-[calc(50vw-2.5rem)]" : "opacity-0 translate-x-[10%]"
           }`}
           ref={ref}
         >
@@ -94,7 +95,7 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
             {currentDocuments ? (
               <div className="overflow-y-auto flex-grow dark-scrollbar flex relative flex-col">
                   {
-                       modalContent ? `内容：${modalContent}` : ''
+                       content ? `内容：${content}` : ''
                   }
               </div>
             ) : (
