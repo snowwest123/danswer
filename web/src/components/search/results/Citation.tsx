@@ -19,6 +19,8 @@ export function Citation({
     return (
       <CustomTooltip
         citation
+        position="top"
+        light
         content={<div className="inline-block p-0 m-0 truncate">{link}</div>}
       >
         <a

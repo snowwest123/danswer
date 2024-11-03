@@ -22,6 +22,10 @@ interface ChatContextProps {
   shouldDisplaySourcesIncompleteModal?: boolean;
   defaultAssistantId?: number;
   refreshChatSessions: () => Promise<void>;
+  showDocumentSidebar: boolean;
+  setShowDocumentSidebar: React.Dispatch<React.SetStateAction<boolean>>;
+  modalContent: null | string;
+  setModalContent: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
@@ -36,6 +40,8 @@ export const ChatProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ value, children }) => {
   const [chatSessions, setChatSessions] = useState(value?.chatSessions || []);
+  const [showDocumentSidebar, setShowDocumentSidebar] = useState(false);
+  const [modalContent, setModalContent] = useState<null | string>(null);
 
   const refreshChatSessions = async () => {
     try {
@@ -54,6 +60,10 @@ export const ChatProvider: React.FC<{
         ...value,
         chatSessions,
         refreshChatSessions,
+        showDocumentSidebar,
+        setShowDocumentSidebar,
+        modalContent, 
+        setModalContent
       }}
     >
       {children}

@@ -4,7 +4,9 @@ import { ChatDocumentDisplay } from "./ChatDocumentDisplay";
 import { usePopup } from "@/components/admin/connectors/Popup";
 import { removeDuplicateDocs } from "@/lib/documentUtils";
 import { Message } from "../interfaces";
-import { ForwardedRef, forwardRef } from "react";
+import { ForwardedRef, forwardRef, useEffect } from "react";
+import { autorun } from "mobx";
+import { useChatContext } from "@/components/context/ChatContext";
 
 interface DocumentSidebarProps {
   closeSidebar: () => void;
@@ -42,7 +44,10 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
 
     const currentDocuments = selectedMessage?.documents || null;
     const dedupedDocuments = removeDuplicateDocs(currentDocuments || []);
-
+    const {
+      showDocumentSidebar,
+      modalContent, 
+    } = useChatContext();
     // NOTE: do not allow selection if less than 75 tokens are left
     // this is to prevent the case where they are able to select the doc
     // but it basically is unused since it's truncated right at the very
@@ -50,9 +55,11 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
     // space
     const tokenLimitReached = selectedDocumentTokens > maxTokens - 75;
 
+
+
     return (
       <div
-        className={`${isOpen ? "w-auto" : "w-0"}`}
+        className={`${showDocumentSidebar ? "w-auto" : "w-0"}`}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             closeSidebar();
@@ -62,7 +69,7 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
        
         <div
           className={`z-[100] relative shadow-2xl h-[calc(100vh-60px)] mr-4 mt-4 transform translate-x-0 translate-y-0 mb-4 ml-auto rounded-l-lg md:pb-4 md:pr-1 relative border-l bg-[#fff] sidebar z-50 absolute right-0 transition-all duration-300 ${
-            isOpen ? "opacity-100 md:w-[calc(50vw-2.5rem)]" : "opacity-0 translate-x-[10%]"
+            showDocumentSidebar ? "opacity-100 md:w-[calc(50vw-2.5rem)]" : "opacity-0 translate-x-[10%]"
           }`}
           ref={ref}
         >
@@ -86,40 +93,9 @@ export const DocumentSidebar = forwardRef<HTMLDivElement, DocumentSidebarProps>(
 
             {currentDocuments ? (
               <div className="overflow-y-auto flex-grow dark-scrollbar flex relative flex-col">
-                {dedupedDocuments.length > 0 ? (
-                  dedupedDocuments.map((document, ind) => (
-                    <div
-                      key={document.document_id}
-                      className={`${
-                        ind === dedupedDocuments.length - 1
-                          ? "mb-5"
-                          : "border-b border-border-light mb-3"
-                      }`}
-                    >
-                      <ChatDocumentDisplay
-                        document={document}
-                        setPopup={setPopup}
-                        queryEventId={null}
-                        isAIPick={false}
-                        isSelected={selectedDocumentIds.includes(
-                          document.document_id
-                        )}
-                        handleSelect={(documentId) => {
-                          toggleDocumentSelection(
-                            dedupedDocuments.find(
-                              (document) => document.document_id === documentId
-                            )!
-                          );
-                        }}
-                        tokenLimitReached={tokenLimitReached}
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <div className="mx-3">
-                    <Text>No documents found for the query.</Text>
-                  </div>
-                )}
+                  {
+                       modalContent ? `内容：${modalContent}` : ''
+                  }
               </div>
             ) : (
               !isLoading && (

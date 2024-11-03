@@ -7,6 +7,7 @@ import React, {
   useContext,
 } from "react";
 import { createPortal } from "react-dom";
+import { useChatContext } from "../context/ChatContext";
 
 // Create a context for the tooltip group
 const TooltipGroupContext = createContext<{
@@ -67,7 +68,11 @@ export const CustomTooltip = ({
   const triggerRef = useRef<HTMLSpanElement>(null);
   const { groupHovered, setGroupHovered, hoverCountRef } =
     useContext(TooltipGroupContext);
-
+    const {
+      setShowDocumentSidebar,
+      setModalContent
+    } = useChatContext();
+  
   const showTooltip = () => {
     hoverCountRef.current = true;
 
@@ -84,19 +89,19 @@ export const CustomTooltip = ({
       clearTimeout(timeoutRef.current);
     }
     hoverCountRef.current = false;
-    setIsVisible(false);
     setTimeout(() => {
       if (!hoverCountRef.current) {
         setGroupHovered(false);
+        setIsVisible(false);
       }
-    }, 100);
+    }, 1000);
   };
 
   const updateTooltipPosition = () => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       setTooltipPosition({
-        top: position === "top" ? rect.top - 10 : rect.bottom + 10,
+        top: position === "top" ? rect.top - 40 : rect.bottom + 10,
         left: rect.left + rect.width / 2,
       });
     }
@@ -124,6 +129,12 @@ export const CustomTooltip = ({
         !disabled &&
         createPortal(
           <div
+          onMouseEnter={showTooltip}
+          onClick={() => { 
+            setShowDocumentSidebar(true); 
+            setModalContent((content as any).props?.children as string)
+          }}
+        onMouseLeave={hideTooltip}
             className={`min-w-8 fixed z-[1000] ${
               citation ? "max-w-[350px]" : "w-40"
             } ${large ? (medium ? "w-88" : "w-96") : line && "max-w-64 w-auto"} 
@@ -131,9 +142,9 @@ export const CustomTooltip = ({
             ${
               light
                 ? "text-gray-800 bg-background-200"
-                : "text-white bg-background-800"
+                : "text-white bg-background-0"
             } 
-            rounded-lg shadow-lg`}
+            rounded-lg shadow-lg cursor-pointer`}
             style={{
               top: `${tooltipPosition.top}px`,
               left: `${tooltipPosition.left}px`,

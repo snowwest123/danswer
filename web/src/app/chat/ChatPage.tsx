@@ -132,6 +132,9 @@ export function ChatPage({
     defaultAssistantId,
     shouldShowWelcomeModal,
     refreshChatSessions,
+    showDocumentSidebar,
+    setShowDocumentSidebar,
+    setModalContent
   } = useChatContext();
 
   const { assistants: availableAssistants, finalAssistants } = useAssistants();
@@ -1781,7 +1784,7 @@ export function ChatPage({
   };
   const [documentSelection, setDocumentSelection] = useState(false);
   const toggleDocumentSelectionAspects = () => {
-    setDocumentSelection((documentSelection) => !documentSelection);
+    setShowDocumentSidebar(!showDocumentSidebar);
     setShowDocSidebar(false);
   };
 
@@ -2449,7 +2452,7 @@ export function ChatPage({
                                 stopGenerating={stopGenerating}
                                 openModelSettings={() => setSettingsToggled(true)}
                                 inputPrompts={userInputPrompts}
-                                showDocs={() => setDocumentSelection(true)}
+                                showDocs={() => setShowDocumentSidebar(true)}
                                 selectedDocuments={selectedDocuments}
                                 // assistant stuff
                                 selectedAssistant={liveAssistant}
@@ -2500,7 +2503,10 @@ export function ChatPage({
                         <DocumentSidebar
                         initialWidth={350}
                         ref={innerSidebarElementRef}
-                        closeSidebar={() => setDocumentSelection(false)}
+                        closeSidebar={() => {
+                          setShowDocumentSidebar(false);
+                          setModalContent('');
+                        }}
                         selectedMessage={aiMessage}
                         selectedDocuments={selectedDocuments}
                         toggleDocumentSelection={toggleDocumentSelection}
